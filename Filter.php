@@ -8,8 +8,9 @@ class Filter{
 		$stdin = fopen ('php://stdin', 'r');
     	ob_implicit_flush (true); // Use unbuffered output
 
-   		while ($line = fgets ($stdin))
-   		self::processLine($line);
+   		while ($line = fgets ($stdin)){
+   			self::processLine($line);
+		}
 	}
 
 	public static function getInstance(){
@@ -18,9 +19,13 @@ class Filter{
 	}
 
 	function processLine($line){
-		echo "$line";
+		echo $line;
 	}
 
+	function identifyLine($line){
+		$char = substr($line, 0, 1);
+		return ($char == '[') ? 'error' : ((is_numeric($char) ? 'access' : 'other'));
+	}
 }
 
 Filter::getInstance();
