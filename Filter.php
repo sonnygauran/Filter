@@ -19,7 +19,7 @@ class Filter{
 	}
 
 	function processLine($line){
-		$type = identifyLine($line);
+		$type = self::identifyLine($line);
 		switch($type){
 			case 'access':
 				break;
