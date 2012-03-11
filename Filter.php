@@ -19,7 +19,15 @@ class Filter{
 	}
 
 	function processLine($line){
-		echo $line;
+		$type = identifyLine($line);
+		switch($type){
+			case 'access':
+				break;
+			case 'error':
+				break;
+			default:
+				print "$line\n";
+		}
 	}
 
 	function identifyLine($line){
