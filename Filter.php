@@ -23,9 +23,11 @@ class Filter{
 		switch($type){
 			case 'access':
 				echo self::traceIP($line, 'access') . "\n";
+				echo self::traceDate($line, 'access') . "\n";
 				break;
 			case 'error':
 				echo self::traceIP($line, 'error') . "\n";
+				echo self::traceDate($line, 'error') . "\n";
 				break;
 			default:
 				print "$line\n";
@@ -48,6 +50,22 @@ class Filter{
 			}
 		}
 		return $client;
+	}
+
+	function traceDate($line, $line_type){
+		$date = null;
+		$startTracing = false;
+		if($line_type == 'error'){
+			$date = substr($line, 1, 24);
+		}else{
+			for($i = 0; $i < strlen($line); $i++){
+				$character = substr($line, $i, 1);
+				if($character == '+') $startTracing = false;
+				if($startTracing) $date .= $character;
+				if($character == '[') $startTracing = true;
+			}
+		}
+		return $date;
 	}
 
 	function identifyLine($line){
