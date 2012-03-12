@@ -22,12 +22,32 @@ class Filter{
 		$type = self::identifyLine($line);
 		switch($type){
 			case 'access':
+				echo self::traceIP($line, 'access') . "\n";
 				break;
 			case 'error':
+				echo self::traceIP($line, 'error') . "\n";
 				break;
 			default:
 				print "$line\n";
 		}
+	}
+
+	function traceIP($line, $line_type){
+		$client = "";
+		$character = null;
+		$startTracing = false;
+		for($i = 0; $i < strlen($line); $i++){
+			$character = substr($line, $i, 1);
+			if($line_type == 'access'){
+				if($character != '.' && !is_numeric($character)) break;
+				$client .= $character;
+			}else{
+				if($character == ']') $startTracing = false;
+				if($startTracing) $client .= $character;
+				if($i == 42) $startTracing = true;
+			}
+		}
+		return $client;
 	}
 
 	function identifyLine($line){
