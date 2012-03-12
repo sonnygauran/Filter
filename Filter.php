@@ -1,5 +1,7 @@
 <?php
 
+define('DATE_FORMAT', 'd/M/Y:G:i:s');
+
 class Filter{
 
 	private static $instance;
@@ -27,7 +29,7 @@ class Filter{
 				break;
 			case 'error':
 				echo self::traceIP($line, 'error') . "\n";
-				echo self::traceDate($line, 'error') . "\n";
+				echo self::convertDate(self::traceDate($line, 'error')) . "\n";
 				break;
 			default:
 				print "$line\n";
@@ -66,6 +68,10 @@ class Filter{
 			}
 		}
 		return $date;
+	}
+
+	function convertDate($date){
+		return date(DATE_FORMAT, strtotime($date));
 	}
 
 	function identifyLine($line){
