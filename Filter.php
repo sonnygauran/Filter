@@ -122,6 +122,11 @@ class Filter{
 		echo "$length\n";
 		$error_meta["Message"] = substr($line, $start, $length);
 
+		/** Trace error source **/
+		$location = explode(" ", substr($line, strpos($line, "/home")));
+		$error_meta["Source"] = $location[0];
+		$error_meta["Line Number"] = "{$location[2]} " . substr($location[3], 0, strlen($location[3])-1);
+
 		return $error_meta;
 	}
 
