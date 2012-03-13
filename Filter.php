@@ -97,11 +97,12 @@ class Filter{
 				if($startTracing) $detail .= $character;
 			}
 			$temp = explode(" ", $raw_details[0]);
-			$details["HTTP_Request"] = $temp[0];			
-			$details["URI_Request"] = $temp[1];
+			$details["HTTP Request"] = $temp[0];			
+			$details["URI Request"] = $temp[1];
 			$details["Protocol"] = $temp[2];
 			$details["URL"] = $raw_details[1];
-			$details["Client_Details"] = $raw_details[2];
+			$details["Browser Information"] = $raw_details[2];
+			$details += self::traceAccessResponse($line, $details["Protocol"]);
 		}else{
 			$details = self::traceErrorMeta($line);
 		}
@@ -113,6 +114,20 @@ class Filter{
 		$error_meta["Type"] = ($position === false) ? "Fatal error" : "Warning";
 		$error_meta["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
 		return $error_meta;
+	}
+
+	function traceAccessResponse($line, $protocol){
+		$index = strpos($line, $protocol);
+		$pointer = $index + strlen($protocol) + 2;
+		$temp = "";
+		for($i = $pointer; substr($line, $i, 1) != '"'; $i++){
+			$temp .= substr($line, $i, 1);
+		}
+		$raw_details = explode(" ", $temp);
+		$details["HTTP Response"] = $raw_details[0];
+		$details["Size"] = $raw_details[1];
+
+		return $details;
 	}
 }
 
