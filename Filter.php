@@ -24,8 +24,10 @@ class Filter{
 		$type = self::identifyLine($line);
 		switch($type){
 			case 'access':
+				$details = self::traceDetails($line, 'access');
 				echo self::traceIP($line, 'access') . "\n";
 				echo self::traceDate($line, 'access') . "\n";
+				print_r($details);
 				break;
 			case 'error':
 				echo self::traceIP($line, 'error') . "\n";
@@ -77,6 +79,33 @@ class Filter{
 	function identifyLine($line){
 		$char = substr($line, 0, 1);
 		return ($char == '[') ? 'error' : ((is_numeric($char) ? 'access' : 'other'));
+	}
+
+	function traceDetails($line, $line_type){
+		$startTracing = false;
+		$raw_details = array();
+		$details =array();
+		$detail = "";
+		if($line_type == 'access'){
+			for($i = 0; $i < strlen($line); $i++){
+				$character = substr($line, $i, 1);
+				if($character == '"' ){
+					if($startTracing){
+						$raw_details[count($raw_details)] = substr($detail, 1);
+						$detail = "";
+					}
+					$startTracing = !$startTracing;
+				}
+				if($startTracing) $detail .= $character;
+			}
+			$temp = explode(" ", $raw_details[0]);
+			$details["http_request"] = $temp[0];			
+			$details["uri_request"] = $temp[1];
+			$details["protocol"] = $temp[2];
+			$details["url"] = $raw_details[1];
+			$details["client_details"] = $raw_details[2];
+		}
+		return $details;
 	}
 }
 
