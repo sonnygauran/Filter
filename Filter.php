@@ -22,16 +22,14 @@ class Filter{
 
 	function processLine($line){
 		$type = self::identifyLine($line);
+		
 		switch($type){
 			case 'access':
-				$details = self::traceDetails($line, 'access');
-				echo self::traceIP($line, 'access') . "\n";
-				echo self::traceDate($line, 'access') . "\n";
-				print_r($details);
-				break;
 			case 'error':
-				echo self::traceIP($line, 'error') . "\n";
-				echo self::convertDate(self::traceDate($line, 'error')) . "\n";
+				$details["IP"] = self::traceIP($line, $type);
+				$details["Date"] = self::convertDate(self::traceDate($line, $type));
+				$details += self::traceDetails($line, $type);
+				print_r($details);
 				break;
 			default:
 				print "$line\n";
@@ -99,13 +97,22 @@ class Filter{
 				if($startTracing) $detail .= $character;
 			}
 			$temp = explode(" ", $raw_details[0]);
-			$details["http_request"] = $temp[0];			
-			$details["uri_request"] = $temp[1];
-			$details["protocol"] = $temp[2];
-			$details["url"] = $raw_details[1];
-			$details["client_details"] = $raw_details[2];
+			$details["HTTP_Request"] = $temp[0];			
+			$details["URI_Request"] = $temp[1];
+			$details["Protocol"] = $temp[2];
+			$details["URL"] = $raw_details[1];
+			$details["Client_Details"] = $raw_details[2];
+		}else{
+			$details = self::traceErrorMeta($line);
 		}
 		return $details;
+	}
+
+	function traceErrorMeta($line){
+		$position = strpos($line, "PHP Warning");
+		$error_meta["Type"] = ($position === false) ? "Fatal error" : "Warning";
+		$error_meta["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
+		return $error_meta;
 	}
 }
 
