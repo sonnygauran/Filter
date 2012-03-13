@@ -104,30 +104,23 @@ class Filter{
 			$details["Client Information"] = $raw_details[2];
 			$details += self::traceAccessResponse($line, $details["Protocol"]);
 		}else{
-			$details = self::traceErrorMeta($line);
+			$position = strpos($line, "PHP Warning");
+			$details["Type"] = ($position === false) ? "Fatal error" : "Warning";
+			$details["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
+			
+			/** Tracing the error message **/
+			$string = "PHP {$error_meta["Type"]}: ";
+			$start = strpos($line, $string) + strlen($string);
+			$length = strlen($line) - (strlen($line) - (strpos($line, ' in /home/')) + ($start));
+			$details["Message"] = substr($line, $start, $length);
+
+			/** Trace error source **/
+			$location = explode(" ", substr($line, strpos($line, "/home")));
+			$details["Source"] = $location[0];
+			$details["Line Number"] = "{$location[2]} " . substr($location[3], 0, strlen($location[3])-1);
 			
 		}
 		return $details;
-	}
-
-	function traceErrorMeta($line){
-		$position = strpos($line, "PHP Warning");
-		$error_meta["Type"] = ($position === false) ? "Fatal error" : "Warning";
-		$error_meta["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
-		
-		/** Tracing the error message **/
-		$string = "PHP {$error_meta["Type"]}: ";
-		$start = strpos($line, $string) + strlen($string);
-		$length = strlen($line) - (strlen($line) - (strpos($line, ' in /home/')) + ($start));
-		echo "$length\n";
-		$error_meta["Message"] = substr($line, $start, $length);
-
-		/** Trace error source **/
-		$location = explode(" ", substr($line, strpos($line, "/home")));
-		$error_meta["Source"] = $location[0];
-		$error_meta["Line Number"] = "{$location[2]} " . substr($location[3], 0, strlen($location[3])-1);
-
-		return $error_meta;
 	}
 
 	function traceAccessResponse($line, $protocol){
