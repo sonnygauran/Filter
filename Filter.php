@@ -101,10 +101,11 @@ class Filter{
 			$details["URI Request"] = $temp[1];
 			$details["Protocol"] = $temp[2];
 			$details["URL"] = $raw_details[1];
-			$details["Browser Information"] = $raw_details[2];
+			$details["Client Information"] = $raw_details[2];
 			$details += self::traceAccessResponse($line, $details["Protocol"]);
 		}else{
 			$details = self::traceErrorMeta($line);
+			
 		}
 		return $details;
 	}
@@ -113,6 +114,14 @@ class Filter{
 		$position = strpos($line, "PHP Warning");
 		$error_meta["Type"] = ($position === false) ? "Fatal error" : "Warning";
 		$error_meta["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
+		
+		/** Tracing the error message **/
+		$string = "PHP {$error_meta["Type"]}: ";
+		$start = strpos($line, $string) + strlen($string);
+		$length = strlen($line) - (strlen($line) - (strpos($line, ' in /home/')) + ($start));
+		echo "$length\n";
+		$error_meta["Message"] = substr($line, $start, $length);
+
 		return $error_meta;
 	}
 
@@ -129,6 +138,8 @@ class Filter{
 
 		return $details;
 	}
+
+
 }
 
 Filter::getInstance();
