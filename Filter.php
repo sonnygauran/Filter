@@ -29,6 +29,7 @@ class Filter{
 				$details["IP"] = self::traceIP($line, $type);
 				$details["Date"] = self::convertDate(self::traceDate($line, $type));
 				$details += self::traceDetails($line, $type);
+				ksort($details);
 				print_r($details);
 				break;
 			default:
@@ -106,16 +107,16 @@ class Filter{
 		}else{
 			$position = strpos($line, "PHP Warning");
 			$details["Type"] = ($position === false) ? "Fatal error" : "Warning";
-			$details["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
+			//$details["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
 			
 			/** Tracing the error message **/
-			$string = "PHP {$error_meta["Type"]}: ";
-			$start = strpos($line, $string) + strlen($string);
-			$length = strlen($line) - (strlen($line) - (strpos($line, ' in /home/')) + ($start));
+			$string = "PHP {$details["Type"]}: ";
+			$start = strpos($line, $string) + strlen($string) + 1;
+			$length = strlen($line) - ((strlen($line) - (strpos($line, ' in /home/'))) + ($start));
 			$details["Message"] = substr($line, $start, $length);
 
 			/** Trace error source **/
-			$location = explode(" ", substr($line, strpos($line, "/home")));
+			$location = explode(" ", substr(substr($line, strpos($line, " in /home")), 4));
 			$details["Source"] = $location[0];
 			$details["Line Number"] = "{$location[2]} " . substr($location[3], 0, strlen($location[3])-1);
 			
