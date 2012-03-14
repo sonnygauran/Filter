@@ -7,6 +7,7 @@ class Filter{
 	private static $instance;
 
 	protected function __construct(){
+		
 		$stdin = fopen ('php://stdin', 'r');
     	ob_implicit_flush (true); // Use unbuffered output
 
@@ -21,14 +22,15 @@ class Filter{
 	}
 
 	function processLine($line){
+		$column_width = `tput cols`;
 		$type = self::identifyLine($line);
 		$details = self::traceDetails($line, $type);
-		print_r($details);
 		
+
 		switch($type){
 			case 'access':
-				break;
 			case 'error':
+				print_r($details);
 				break;
 			default:
 				print "$line\n";
