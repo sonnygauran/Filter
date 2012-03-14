@@ -142,7 +142,14 @@ class Filter{
 
 		return $details;
 	}
+	
+	function space($count){
+		$space = "";
+		for($i = 0; $i < $count; $i++)
+			$space .= " ";
 
+		return $space;
+	}
 
 }
 
