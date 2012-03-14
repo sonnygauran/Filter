@@ -49,7 +49,7 @@ class Filter{
 		$details = self::traceDetails($line, $type);
 		$start = " Start ";
 		$end = " End ";
-		echo self::center($start, "#") . "\n\n";
+		echo self::center($start, "#") . "\n";
 
 		switch($type){
 			case 'error':
