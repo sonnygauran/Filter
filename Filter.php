@@ -22,15 +22,13 @@ class Filter{
 
 	function processLine($line){
 		$type = self::identifyLine($line);
+		$details = self::traceDetails($line, $type);
+		print_r($details);
 		
 		switch($type){
 			case 'access':
+				break;
 			case 'error':
-				$details["IP"] = self::traceIP($line, $type);
-				$details["Date"] = self::convertDate(self::traceDate($line, $type));
-				$details += self::traceDetails($line, $type);
-				ksort($details);
-				print_r($details);
 				break;
 			default:
 				print "$line\n";
@@ -104,7 +102,7 @@ class Filter{
 			$details["URL"] = $raw_details[1];
 			$details["Client Information"] = $raw_details[2];
 			$details += self::traceAccessResponse($line, $details["Protocol"]);
-		}else{
+		}else if($line_type == 'error'){
 			$position = strpos($line, "PHP Warning");
 			$details["Type"] = ($position === false) ? "Fatal error" : "Warning";
 			//$details["Position"] = ($position === false) ? strpos($line, "PHP Fatal error") : $position;
@@ -120,7 +118,14 @@ class Filter{
 			$details["Source"] = $location[0];
 			$details["Line Number"] = "{$location[2]} " . substr($location[3], 0, strlen($location[3])-1);
 			
+		}else{
+			return $line;
 		}
+
+		$details["IP"] = self::traceIP($line, $line_type);
+		$details["Date"] = self::convertDate(self::traceDate($line, $line_type));
+		ksort($details);
+
 		return $details;
 	}
 
