@@ -5,6 +5,7 @@ define('DATE_FORMAT', 'd/M/Y:G:i:s');
 class Filter{
 
 	private static $instance;
+	private static $column_width;
 
 	protected function __construct(){
 		
@@ -22,19 +23,40 @@ class Filter{
 	}
 
 	function processLine($line){
-		$column_width = `tput cols`;
+		self::$column_width = `tput cols`;
 		$type = self::identifyLine($line);
 		$details = self::traceDetails($line, $type);
-		
+		$start = " Start ";
+		$end = " End ";
+
+		echo self::center($start, "'");
 
 		switch($type){
-			case 'access':
 			case 'error':
+				
+				/** Determine error header **/
+				$temp = "PHP {$details['Type']}";
+				$space = self::$column_width - (strlen($temp) + strlen($details['Date']));
+				$message[0] = "$temp" . self::character($space, " ") . $details['Date'];
+			
+				$temp = "{$details['Source']} {$details['Line Number']}";
+				$space = self::$column_width - (strlen($temp) + strlen($details['IP']));
+				$message[1] = "$temp" . self::character($space, " ") . $details['IP'] . "\n";
+				
+				$message[2] = $details['Message'];
+
+				for($i = 0; $i < count($message); $i++) echo $message[$i];
+				echo "\n\n";
+				
+				break;
+
+			case 'access':
 				print_r($details);
 				break;
 			default:
 				print "$line\n";
 		}
+		echo self::center($end, "'") . "\n\n";
 	}
 
 	function traceIP($line, $line_type){
@@ -145,12 +167,21 @@ class Filter{
 		return $details;
 	}
 	
-	function space($count){
-		$space = "";
+	function character($count, $character){
+		$output = "";
 		for($i = 0; $i < $count; $i++)
-			$space .= " ";
+			$output .= $character;
 
-		return $space;
+		return $output;
+	}
+
+	function center($message, $character){
+		$space = self::$column_width/2 - (strlen($message)/2);
+        $message = self::character($space,$character) . $message;
+        $space = self::$column_width - strlen($message);
+        $message .= self::character($space, $character);
+
+		return $message;
 	}
 
 }
