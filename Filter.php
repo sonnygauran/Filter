@@ -6,6 +6,27 @@ class Filter{
 
 	private static $instance;
 	private static $column_width;
+	private $_colors = array(
+        'LIGHT_RED'      => "[1;31m",
+        'LIGHT_GREEN'     => "[1;32m",
+        'YELLOW'         => "[1;33m",
+        'LIGHT_BLUE'     => "[1;34m",
+        'MAGENTA'     => "[1;35m",
+        'LIGHT_CYAN'     => "[1;36m",
+        'WHITE'         => "[1;37m",
+        'NORMAL'         => "[0m",
+        'BLACK'         => "[0;30m",
+        'RED'         => "[0;31m",
+        'GREEN'         => "[0;32m",
+        'BROWN'         => "[0;33m",
+        'BLUE'         => "[0;34m",
+        'CYAN'         => "[0;36m",
+        'BOLD'         => "[1m",
+        'UNDERSCORE'     => "[4m",
+        'REVERSE'     => "[7m",
+
+	);
+
 
 	protected function __construct(){
 		
@@ -28,8 +49,7 @@ class Filter{
 		$details = self::traceDetails($line, $type);
 		$start = " Start ";
 		$end = " End ";
-
-		echo self::center($start, "'");
+		echo self::center($start, "#") . "\n\n";
 
 		switch($type){
 			case 'error':
@@ -56,7 +76,7 @@ class Filter{
 			default:
 				print "$line\n";
 		}
-		echo self::center($end, "'") . "\n\n";
+		echo self::center($end, "#") . "\n\n";
 	}
 
 	function traceIP($line, $line_type){
@@ -184,6 +204,16 @@ class Filter{
 		return $message;
 	}
 
+	function colorize($text, $color="NORMAL", $back=1){
+    	global $_colors;
+    	$out = $_colors["$color"];
+    	if($out == ""){ $out = "[0m"; }
+    	if($back){
+    	    return chr(27)."$out$text".chr(27)."[0m";
+    	}else{
+        	echo chr(27)."$out$text".chr(27).chr(27)."[0m";
+	    }
+	}
 }
 
 Filter::getInstance();
